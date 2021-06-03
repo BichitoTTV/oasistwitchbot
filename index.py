@@ -45,8 +45,7 @@ def checkuser(user):
             return False
     except IndexError:
         return False
-
-# Executes when bot is started
+# Evento para obtener los streamers
 @bot.event
 async def on_ready():
     # Comprueba usuarios en directo cada 10 segundos.
@@ -72,9 +71,9 @@ async def on_ready():
                             break
 
                         else:
-                            # Gets all the members in your guild.
+                            # Consigue el ID de todos los miembros del servidor.
                             async for member in guild.fetch_members(limit=None):
-                            # Sends the live notification to the 'twitch streams' channel then breaks the loop.
+                            # Manda la notificación y para el bucle.
                                 await channel.send(
                                 f":red_circle: **LIVE**\n{twitch_name} está ahora en directo en Twitch!"
                                 f"\nhttps://www.twitch.tv/{twitch_name}")
