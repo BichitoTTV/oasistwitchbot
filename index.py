@@ -14,7 +14,7 @@ bot = commands.Bot(command_prefix='$', description="Esto es un bot de pruebas", 
 TOKEN = os.getenv('TESTINGMF_DISCORD_TOKEN')
 
 
-# Autentificandonos con la API De TWITCH
+# Autentificandonos con la API De TWITCH [NO TOCAR]
 client_id = "uuvhaiw9w5bnfb0sx7o5bfukist657"
 client_secret = "bjky7un8zsxnc2ssity80x8nrezxam"
 twitch = Twitch(client_id, client_secret)
@@ -57,8 +57,8 @@ async def on_ready():
             streamers = json.loads(file.read())
         if streamers is not None:
             # Introducir aqui los datos del servidor de Discord.
-            guild = bot.get_guild(843540178345263154)
-            channel = bot.get_channel(843540178345263156)
+            guild = bot.get_guild(SERVERID)
+            channel = bot.get_channel(CHANNELID)
             for user_id, twitch_name in streamers.items():
                 # Comprueba que el usuario está en directo mediante checkuser
                 # True si lo está y False si no.
@@ -97,9 +97,8 @@ async def add_twitch(ctx, twitch_name):
     with open('streamers.json', 'r') as file:
         streamers = json.loads(file.read())
     
-    # Gets the users id that called the command.
+    # Guarda el usuario que ejecutó el comando y añade el streamer.
     user_id = ctx.author.id
-    # Assigns their given twitch_name to their discord id and adds it to the streamers.json.
     streamers[user_id] = twitch_name
     
     # Añade la nueva linea al JSON.
@@ -127,4 +126,4 @@ async def ping(ctx):
 
 # Ejecutamos el bot
 print('Bot Funcionando.')
-bot.run('ODUwMTI3MDE1MDkyNjgyODEy.YLlMeg.p0cy5SPHaQn24XqDN1UfPIpkg7k')
+bot.run('TOKEN')
