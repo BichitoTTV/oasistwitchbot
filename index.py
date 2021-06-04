@@ -86,7 +86,7 @@ async def on_ready():
                             else:
                             # Manda la notificación de directo.
                                 await channel.send(
-                                f":red_circle: **LIVE** {twitch_name} está ahora en directo en Twitch! "
+                                f":red_circle: **DIRECTO** {twitch_name} está ahora en directo en Twitch! "
                                 f"https://www.twitch.tv/{twitch_name}")
                                 print(f"{twitch_name} Notificación enviada.")
                             break
@@ -136,17 +136,12 @@ async def ping(ctx):
     await ctx.send(embed=embed)
 
 # Comando para leer el JSON en Discord.
-@bot.command()
-async def list(ctx):
-    with open('streamers.json') as file:
-        streamerlist = json.load(file)
-
-        embed = discord.Embed(title=f"{ctx.guild.name}", description="Servicios del bot de Streamers de Oasis de RP", timestamp=datetime.datetime.utcnow(), color=discord.Color.blue())
-        embed.add_field(name="Lista de Streamers:", value=streamerlist)
-        embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/eQYiay_XLmml_twRzutAcrS0OgVTjxAk0aQZgKcN8Zk/%3Fwidth%3D940%26height%3D683/https/media.discordapp.net/attachments/763881075629883452/773126293004484628/Marca_de_agua.png")
-        await ctx.send(embed=embed)
-        print("Lista de Streamers enviada.")
+@bot.command(pass_context = True)
+async def streamerlist(ctx):
+    await ctx.send(f"Lista de Streamers con acceso al bot de Notificaciones solicitada por: @{ctx.author}")
+    await ctx.send(file=discord.File(r'streamers.json'))
+    print("Lista de Streamers enviada.")
 
 # Ejecutamos el bot
-print('Bot Funcionando.')
+print('Bot Iniciado.')
 bot.run('TOKEN')
