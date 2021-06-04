@@ -13,7 +13,7 @@ from discord.utils import get
 intents = discord.Intents.all()
 activity = discord.Streaming(name="OasisRP", url="https://www.twitch.tv/team/oasisrp")
 bot = commands.Bot(command_prefix='$', description="Bot de Notificación de Streamings para Oasis RP.", intents=intents, activity=activity, status=discord.Status.idle)
-
+bot.remove_command('help')
 TOKEN = os.getenv('TESTINGMF_DISCORD_TOKEN')
 
 
@@ -126,9 +126,12 @@ async def add_streamer(ctx, twitch_name):
 #Comando para ver el estado del bot.
 @bot.command()
 async def ping(ctx):
+    count = len(open('streamers.json').readlines(  ))
+    cantidadstreamers = count - 2
     embed = discord.Embed(title=f"{ctx.guild.name}", description="Servicios del bot de Streamers de Oasis de RP", timestamp=datetime.datetime.utcnow(), color=discord.Color.green())
-    embed.add_field(name="Estado del Bot:", value="🟢 Correcto.")
-    embed.add_field(name="Estado del Servicio de Twitch:", value="🟢 Correcto.")
+    embed.add_field(name="Estado del Bot:", value="🟢 Correcto.", inline=False )
+    embed.add_field(name="Estado del Servicio de Twitch:", value="🟢 Correcto.", inline=False)
+    embed.add_field(name="Cantidad de Streamers en Lista:", value=f"👤 {cantidadstreamers}", inline=False)
 
     # embed.set_thumbnail(url=f"{ctx.guild.icon}")
     embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/eQYiay_XLmml_twRzutAcrS0OgVTjxAk0aQZgKcN8Zk/%3Fwidth%3D940%26height%3D683/https/media.discordapp.net/attachments/763881075629883452/773126293004484628/Marca_de_agua.png")
@@ -138,10 +141,27 @@ async def ping(ctx):
 # Comando para leer el JSON en Discord.
 @bot.command(pass_context = True)
 async def streamerlist(ctx):
-    await ctx.send(f"Lista de Streamers con acceso al bot de Notificaciones solicitada por: @{ctx.author}")
+    count = len(open('streamers.json').readlines(  ))
+    cantidadstreamers = count - 2
+    await ctx.send(f"Lista de los {cantidadstreamers} Streamers con acceso al bot de Notificaciones solicitada por: @{ctx.author}")
     await ctx.send(file=discord.File(r'streamers.json'))
     print("Lista de Streamers enviada.")
 
+# Comando HELP
+@bot.command(pass_context=True)
+async def help(ctx):
+    help = discord.Embed(title="Comando de ayuda", timestamp=datetime.datetime.utcnow(), color=discord.Color.red())
+    help.add_field(name="$ping", value="Muestra el estado actual del bot.", inline=False)
+    help.add_field(name="$streamerlist", value="Devuelve la lista de Streamers con las Notificaciones por Bot Activadas.", inline=False)
+    help.add_field(name="$addstreamer", value="Añade un streamer a la lista de Notificación.", inline=False)
+    help.add_field(name="$help", value="Muestra este menssaje.", inline=False)
+
+    # embed.set_thumbnail(url=f"{ctx.guild.icon}")
+    help.set_thumbnail(url="https://images-ext-1.discordapp.net/external/eQYiay_XLmml_twRzutAcrS0OgVTjxAk0aQZgKcN8Zk/%3Fwidth%3D940%26height%3D683/https/media.discordapp.net/attachments/763881075629883452/773126293004484628/Marca_de_agua.png")
+    print(f'Comando de ayuda solicitado por {ctx.author}')
+    await ctx.send(embed=help)
+
+
 # Ejecutamos el bot
 print('Bot Iniciado.')
-bot.run('TOKEN')
+bot.run('ODUwMzQ5MjQ0ODEyNjIzOTQz.YLobcg.UJx_3qOIB-0WHXSRnvUIsLiFyZA')
