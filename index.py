@@ -4,13 +4,15 @@ import discord
 import requests
 import datetime
 import time
-
+  
+from pypresence import Presence
 from discord.ext import tasks, commands
 from twitchAPI.twitch import Twitch
 from discord.utils import get
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix='$', description="Bot de Notificación de Streamings para Oasis RP.", intents=intents)
+activity = discord.Streaming(name="OasisRP", url="https://www.twitch.tv/team/oasisrp")
+bot = commands.Bot(command_prefix='$', description="Bot de Notificación de Streamings para Oasis RP.", intents=intents, activity=activity, status=discord.Status.idle)
 
 TOKEN = os.getenv('TESTINGMF_DISCORD_TOKEN')
 
@@ -27,6 +29,8 @@ API_HEADERS = {
 }
 
 print('Bot Autentificado con la APP de Twitch.')
+
+# Events
 
 # Devuelve True si el Streamer está en directo. Falso si no.
 def checkuser(user):
@@ -47,7 +51,7 @@ def checkuser(user):
     except IndexError:
         return False
 
-# Executes when bot is started
+# Evento1
 @bot.event
 async def on_ready():
     # Comprueba usuarios en directo cada 60 segundos.
@@ -69,18 +73,31 @@ async def on_ready():
                     # Comprueba si el mensaje ya  ha sido enviado.
                     async for message in channel.history(limit=200):
                         # Si lo está, para el bucle.
-                        if str(twitch_name) in message.content and "está ahora en directo en Twitch!" in message.content:
-                            print(f"{twitch_name} sigue en directo.")
+                        if str(twitch_name) in message.content and "esta en directo." in message.content:
                             break
 
-                else:
+                        else:
+                            
+                            #Cancela mandar la notificación si ya fue enviada.
+                            async for message in channel.history(limit=200):
+                                if str(twitch_name) in message.content and "está ahora en directo en Twitch!" in message.content:
+                                    print(f"{twitch_name} sigue en directo.")
+                                    break
+                            else:
+                            # Manda la notificación de directo.
+                                await channel.send(
+                                f":red_circle: **LIVE** {twitch_name} está ahora en directo en Twitch! "
+                                f"https://www.twitch.tv/{twitch_name}")
+                                print(f"{twitch_name} Notificación enviada.")
+                            break
+                # Si no están en directo:
+                if status is False:
                     # Comprueba si la notificacion fue enviada en los ultimos 200 mensajes.
                      async for message in channel.history(limit=200):
                         # Si lo fue, la borra.
                         if str(twitch_name) in message.content and "está ahora en directo en Twitch!" in message.content:
                             await message.delete()
-                            print(f"{twitch_name} ha parado de retransmitir.")
-                            print("Borrando notificación.")
+                            print(f"{twitch_name}: Notificación Eliminada.")
     # Inicia el bucle
     live_notifs_loop.start()
 
@@ -117,6 +134,18 @@ async def ping(ctx):
     embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/eQYiay_XLmml_twRzutAcrS0OgVTjxAk0aQZgKcN8Zk/%3Fwidth%3D940%26height%3D683/https/media.discordapp.net/attachments/763881075629883452/773126293004484628/Marca_de_agua.png")
     print('Ping solicitado y respondido con éxito.')
     await ctx.send(embed=embed)
+
+# Comando para leer el JSON en Discord.
+@bot.command()
+async def list(ctx):
+    with open('streamers.json') as file:
+        streamerlist = json.load(file)
+
+        embed = discord.Embed(title=f"{ctx.guild.name}", description="Servicios del bot de Streamers de Oasis de RP", timestamp=datetime.datetime.utcnow(), color=discord.Color.blue())
+        embed.add_field(name="Lista de Streamers:", value=streamerlist)
+        embed.set_thumbnail(url="https://images-ext-1.discordapp.net/external/eQYiay_XLmml_twRzutAcrS0OgVTjxAk0aQZgKcN8Zk/%3Fwidth%3D940%26height%3D683/https/media.discordapp.net/attachments/763881075629883452/773126293004484628/Marca_de_agua.png")
+        await ctx.send(embed=embed)
+        print("Lista de Streamers enviada.")
 
 # Ejecutamos el bot
 print('Bot Funcionando.')
