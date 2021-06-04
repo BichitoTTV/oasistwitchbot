@@ -147,6 +147,16 @@ async def streamerlist(ctx):
     await ctx.send(file=discord.File(r'streamers.json'))
     print("Lista de Streamers enviada.")
 
+# comando clear
+
+@bot.command()
+async def clear(ctx, amount):
+    cantidad = int(amount)
+    await ctx.channel.purge(limit=cantidad+1)
+    await ctx.send(f"{amount} Mensajes han sido eliminados.", delete_after=5)
+    print(f"{cantidad} mensajes han sido eliminados de {ctx.channel}")
+        
+
 # Comando HELP
 @bot.command(pass_context=True)
 async def help(ctx):
@@ -154,7 +164,8 @@ async def help(ctx):
     help.add_field(name="$ping", value="Muestra el estado actual del bot.", inline=False)
     help.add_field(name="$streamerlist", value="Devuelve la lista de Streamers con las Notificaciones por Bot Activadas.", inline=False)
     help.add_field(name="$addstreamer", value="Añade un streamer a la lista de Notificación.", inline=False)
-    help.add_field(name="$help", value="Muestra este menssaje.", inline=False)
+    help.add_field(name="$clear", value="Elimina la cantidad de mensajes que se especifiquen a continuacion.", inline=False)
+    help.add_field(name="$help", value="Muestra este mensaje.", inline=False)
 
     # embed.set_thumbnail(url=f"{ctx.guild.icon}")
     help.set_thumbnail(url="https://images-ext-1.discordapp.net/external/eQYiay_XLmml_twRzutAcrS0OgVTjxAk0aQZgKcN8Zk/%3Fwidth%3D940%26height%3D683/https/media.discordapp.net/attachments/763881075629883452/773126293004484628/Marca_de_agua.png")
@@ -164,4 +175,4 @@ async def help(ctx):
 
 # Ejecutamos el bot
 print('Bot Iniciado.')
-bot.run('ODUwMzQ5MjQ0ODEyNjIzOTQz.YLobcg.UJx_3qOIB-0WHXSRnvUIsLiFyZA')
+bot.run('TOKEN')
