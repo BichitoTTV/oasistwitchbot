@@ -3,6 +3,7 @@ import json
 import discord
 import requests
 import datetime
+import time
 
 from discord.ext import tasks, commands
 from twitchAPI.twitch import Twitch
@@ -68,25 +69,18 @@ async def on_ready():
                     # Comprueba si el mensaje ya  ha sido enviado.
                     async for message in channel.history(limit=200):
                         # Si lo está, para el bucle.
-                        if str(twitch_name) in message.content and "esta en directo." in message.content:
+                        if str(twitch_name) in message.content and "está ahora en directo en Twitch!" in message.content:
+                            print(f"{twitch_name} sigue en directo.")
                             break
 
-                        else:
-                            # Saca todos los miembros del servidor.
-                            async for member in guild.fetch_members(limit=None):
-                            # Manda la notificación de directo.
-                                await channel.send(
-                                f":red_circle: **LIVE** {twitch_name} está ahora en directo en Twitch!"
-                                f"\nhttps://www.twitch.tv/{twitch_name}")
-                            print(f"{twitch_name} Notificación enviada.")
-                            break
-                # Si no están en directo:
                 else:
-                    # Comprueba si la notificacion fue enviada.
+                    # Comprueba si la notificacion fue enviada en los ultimos 200 mensajes.
                      async for message in channel.history(limit=200):
                         # Si lo fue, la borra.
-                        if str(twitch_name) in message.content:
+                        if str(twitch_name) in message.content and "está ahora en directo en Twitch!" in message.content:
                             await message.delete()
+                            print(f"{twitch_name} ha parado de retransmitir.")
+                            print("Borrando notificación.")
     # Inicia el bucle
     live_notifs_loop.start()
 
@@ -126,4 +120,4 @@ async def ping(ctx):
 
 # Ejecutamos el bot
 print('Bot Funcionando.')
-bot.run('ODUwMTI3MDE1MDkyNjgyODEy.YLlMeg.EJDxvGk_JXJ6wqJtW19EVyOF_Vw')
+bot.run('TOKEN')
