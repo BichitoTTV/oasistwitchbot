@@ -3,9 +3,7 @@ import json
 import discord
 import requests
 import datetime
-import time
-  
-from pypresence import Presence
+
 from discord.ext import tasks, commands
 from twitchAPI.twitch import Twitch
 from discord.utils import get
@@ -16,7 +14,7 @@ bot = commands.Bot(command_prefix='$', description="Bot de Notificación de Stre
 bot.remove_command('help')
 TOKEN = os.getenv('TESTINGMF_DISCORD_TOKEN')
 
-
+#### TWITCH API ####
 # Autentificandonos con la API De TWITCH [NO TOCAR]
 client_id = "uuvhaiw9w5bnfb0sx7o5bfukist657"
 client_secret = "bjky7un8zsxnc2ssity80x8nrezxam"
@@ -30,7 +28,6 @@ API_HEADERS = {
 
 print('Bot Autentificado con la APP de Twitch.')
 
-# Events
 
 # Devuelve True si el Streamer está en directo. Falso si no.
 def checkuser(user):
@@ -51,11 +48,14 @@ def checkuser(user):
     except IndexError:
         return False
 
-# Evento1
+##### DISCORD.PY #####
+
+## EVENTOS ##
+# Evento OnReady
 @bot.event
 async def on_ready():
     # Comprueba usuarios en directo cada 60 segundos.
-    @tasks.loop(seconds=60)
+    @tasks.loop(seconds=10)
     async def live_notifs_loop():
         # Abre y lee el archivo .JSON, comprueba que no está vacío.
         with open('streamers.json', 'r') as file:
@@ -81,7 +81,6 @@ async def on_ready():
                             #Cancela mandar la notificación si ya fue enviada.
                             async for message in channel.history(limit=200):
                                 if str(twitch_name) in message.content and "está ahora en directo en Twitch!" in message.content:
-                                    print(f"{twitch_name} sigue en directo.")
                                     break
                             else:
                             # Manda la notificación de directo.
@@ -100,8 +99,10 @@ async def on_ready():
                             print(f"{twitch_name}: Notificación Eliminada.")
     # Inicia el bucle
     live_notifs_loop.start()
+    
+#### COMANDOS ####
 
-# Comando para añadir streamers al JSON
+# Comando ADDSTREAMER
 @bot.command(name='addstreamer', help='Añade un canal de Twitch a la lista de notificaciones.', pass_context=True)
 async def add_streamer(ctx, twitch_name):
     # Abre y lee el archivo JSON
@@ -123,7 +124,7 @@ async def add_streamer(ctx, twitch_name):
     await ctx.send(embed=confirmacion)
     #await ctx.send(f"Añadido {twitch_name} por {ctx.author} a la lista de notificación.")
 
-#Comando para ver el estado del bot.
+#Comando PING
 @bot.command()
 async def ping(ctx):
     count = len(open('streamers.json').readlines(  ))
@@ -138,7 +139,7 @@ async def ping(ctx):
     print('Ping solicitado y respondido con éxito.')
     await ctx.send(embed=embed)
 
-# Comando para leer el JSON en Discord.
+# Comando STREAMERLIST
 @bot.command(pass_context = True)
 async def streamerlist(ctx):
     count = len(open('streamers.json').readlines(  ))
@@ -147,15 +148,30 @@ async def streamerlist(ctx):
     await ctx.send(file=discord.File(r'streamers.json'))
     print("Lista de Streamers enviada.")
 
-# comando clear
-
+# Comando CLEAR
 @bot.command()
 async def clear(ctx, amount):
     cantidad = int(amount)
     await ctx.channel.purge(limit=cantidad+1)
     await ctx.send(f"{amount} Mensajes han sido eliminados.", delete_after=5)
     print(f"{cantidad} mensajes han sido eliminados de {ctx.channel}")
-        
+
+
+#### ERRORES ####
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send('Comando inexistente.')
+
+@clear.error
+async def clear_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send('Por favor, introduce la cantidad de mensajes a eliminar.')
+
+@addtwitch.error
+async def addtwitch_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send('Por favor, introduce el canal de Twitch a añadir.')
 
 # Comando HELP
 @bot.command(pass_context=True)
@@ -175,4 +191,4 @@ async def help(ctx):
 
 # Ejecutamos el bot
 print('Bot Iniciado.')
-bot.run('TOKEN')
+bot.run('NjMzNjkzNTQxMzAxODc4Nzk5.XaXrGQ.cprxDl9l4KvpKsfY8UuVbMjaWJk')
