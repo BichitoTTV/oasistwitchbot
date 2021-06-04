@@ -9,7 +9,7 @@ from twitchAPI.twitch import Twitch
 from discord.utils import get
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix='$', description="Esto es un bot de pruebas", intents=intents)
+bot = commands.Bot(command_prefix='$', description="Bot de Notificación de Streamings para Oasis RP.", intents=intents)
 
 TOKEN = os.getenv('TESTINGMF_DISCORD_TOKEN')
 
@@ -91,8 +91,8 @@ async def on_ready():
     live_notifs_loop.start()
 
 # Comando para añadir streamers al JSON
-@bot.command(name='addtwitch', help='Añade un canal de Twitch a la lista de notificaciones.', pass_context=True)
-async def add_twitch(ctx, twitch_name):
+@bot.command(name='addstreamer', help='Añade un canal de Twitch a la lista de notificaciones.', pass_context=True)
+async def add_streamer(ctx, twitch_name):
     # Abre y lee el archivo JSON
     with open('streamers.json', 'r') as file:
         streamers = json.loads(file.read())
@@ -103,7 +103,7 @@ async def add_twitch(ctx, twitch_name):
     
     # Añade la nueva linea al JSON.
     with open('streamers.json', 'w') as file:
-        file.write(json.dumps(streamers, skipkeys=True))
+        file.write(json.dumps(streamers, indent=5))
     # Mensaje de confirmación
     confirmacion = discord.Embed(title=f"{ctx.guild.name}", description="Servicios del bot de Streamers de Oasis de RP", timestamp=datetime.datetime.utcnow(), color=discord.Color.green())
     confirmacion.add_field(name="Confirmación de usuario añadido.", value=f"Añadido {twitch_name} por {ctx.author} a la lista de notificación.")
@@ -126,4 +126,4 @@ async def ping(ctx):
 
 # Ejecutamos el bot
 print('Bot Funcionando.')
-bot.run('TOKEN')
+bot.run('ODUwMTI3MDE1MDkyNjgyODEy.YLlMeg.EJDxvGk_JXJ6wqJtW19EVyOF_Vw')
