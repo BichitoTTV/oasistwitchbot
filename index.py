@@ -45,24 +45,25 @@ def checkuser(user):
             return False
     except IndexError:
         return False
-# Evento para obtener los streamers
+
+# Executes when bot is started
 @bot.event
 async def on_ready():
-    # Comprueba usuarios en directo cada 10 segundos.
-    @tasks.loop(seconds=120)
+    # Comprueba usuarios en directo cada 60 segundos.
+    @tasks.loop(seconds=60)
     async def live_notifs_loop():
         # Abre y lee el archivo .JSON, comprueba que no está vacío.
         with open('streamers.json', 'r') as file:
             streamers = json.loads(file.read())
         if streamers is not None:
             # Introducir aqui los datos del servidor de Discord.
-            guild = bot.get_guild(SERVERID)
-            channel = bot.get_channel(CHANNELID)
+            guild = bot.get_guild(843540178345263154)
+            channel = bot.get_channel(850164822305407016)
             for user_id, twitch_name in streamers.items():
                 # Comprueba que el usuario está en directo mediante checkuser
                 # True si lo está y False si no.
                 status = checkuser(twitch_name)
-                # Makes sure they're live
+                # Comprueba si están en directo.
                 if status is True:
                     # Comprueba si el mensaje ya  ha sido enviado.
                     async for message in channel.history(limit=200):
@@ -71,20 +72,20 @@ async def on_ready():
                             break
 
                         else:
-                            # Consigue el ID de todos los miembros del servidor.
+                            # Saca todos los miembros del servidor.
                             async for member in guild.fetch_members(limit=None):
-                            # Manda la notificación y para el bucle.
+                            # Manda la notificación de directo.
                                 await channel.send(
-                                f":red_circle: **LIVE**\n{twitch_name} está ahora en directo en Twitch!"
+                                f":red_circle: **LIVE** {twitch_name} está ahora en directo en Twitch!"
                                 f"\nhttps://www.twitch.tv/{twitch_name}")
-                            print(f"{twitch_name} started streaming. Sending a notification.")
+                            print(f"{twitch_name} Notificación enviada.")
                             break
                 # Si no están en directo:
                 else:
                     # Comprueba si la notificacion fue enviada.
                      async for message in channel.history(limit=200):
                         # Si lo fue, la borra.
-                        if str(twitch_name) in message.content and "está ahora en directo" in message.content:
+                        if str(twitch_name) in message.content:
                             await message.delete()
     # Inicia el bucle
     live_notifs_loop.start()
@@ -97,17 +98,17 @@ async def add_twitch(ctx, twitch_name):
         streamers = json.loads(file.read())
     
     # Guarda el usuario que ejecutó el comando y añade el streamer.
-    user_id = ctx.author.id
+    user_id = twitch_name
     streamers[user_id] = twitch_name
     
     # Añade la nueva linea al JSON.
     with open('streamers.json', 'w') as file:
-        file.write(json.dumps(streamers))
+        file.write(json.dumps(streamers, skipkeys=True))
     # Mensaje de confirmación
     confirmacion = discord.Embed(title=f"{ctx.guild.name}", description="Servicios del bot de Streamers de Oasis de RP", timestamp=datetime.datetime.utcnow(), color=discord.Color.green())
     confirmacion.add_field(name="Confirmación de usuario añadido.", value=f"Añadido {twitch_name} por {ctx.author} a la lista de notificación.")
     confirmacion.set_thumbnail(url="https://images-ext-1.discordapp.net/external/eQYiay_XLmml_twRzutAcrS0OgVTjxAk0aQZgKcN8Zk/%3Fwidth%3D940%26height%3D683/https/media.discordapp.net/attachments/763881075629883452/773126293004484628/Marca_de_agua.png")
-
+    print (f"Añadido usuario: {twitch_name}")
     await ctx.send(embed=confirmacion)
     #await ctx.send(f"Añadido {twitch_name} por {ctx.author} a la lista de notificación.")
 
